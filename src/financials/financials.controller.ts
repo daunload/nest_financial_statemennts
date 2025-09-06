@@ -9,7 +9,7 @@ export class FinancialsController {
 	async getFinanncials(@Query('ticker') ticker: string) {
 		const financials = await this.financialsService.getFinanncials({
 			ticker: ticker,
-			order: 'asc',
+			order: 'desc',
 			limit: 10,
 		});
 

@@ -15,4 +15,15 @@ export class FinancialsController {
 
 		return financials.results;
 	}
+
+	@Get('/news')
+	async getNews(@Query('ticker') ticker: string) {
+		const financials = await this.financialsService.getNews({
+			ticker: ticker,
+			order: 'desc',
+			limit: 10,
+		});
+
+		return financials.results;
+	}
 }

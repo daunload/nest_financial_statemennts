@@ -67,4 +67,38 @@ export class FinancialsService {
 			);
 		}
 	}
+
+	async getNews(params: {
+		ticker?: string;
+		published_utc?: string;
+		order?: string;
+		limit?: number;
+		sort?: string;
+	}): Promise<any> {
+		const queryParams: Record<string, any> = {
+			apiKey: this.apiKey,
+		};
+
+		if (params.ticker) queryParams.ticker = params.ticker;
+		if (params.published_utc)
+			queryParams.published_utc = params.published_utc;
+		if (params.order) queryParams.order = params.order;
+		if (params.limit) queryParams.limit = params.limit;
+		if (params.sort) queryParams.sort = params.sort ?? 'published_utc';
+
+		try {
+			const response = await this.axiosClient.get('/v2/reference/news', {
+				params: queryParams,
+			});
+			return response.data;
+		} catch (error) {
+			const status =
+				error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR;
+			const message = error.response?.data || error.message;
+			throw new HttpException(
+				`Polygon API error: ${JSON.stringify(message)}`,
+				status,
+			);
+		}
+	}
 }

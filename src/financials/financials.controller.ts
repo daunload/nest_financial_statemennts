@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, Post, Body } from '@nestjs/common';
 import { FinancialsService } from './financials.service';
 
 @Controller('financials')
@@ -14,6 +14,20 @@ export class FinancialsController {
 		});
 
 		return financials.results;
+	}
+
+	@Post('analyze')
+	async analyzeStock(
+		@Body()
+		params: {
+			ticker?: string;
+		},
+	) {
+		const filePath = await this.financialsService.analyzeStock(params);
+		return {
+			message: 'Financials data saved successfully',
+			filePath,
+		};
 	}
 
 	@Get('/news')

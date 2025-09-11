@@ -1,6 +1,8 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import axios, { AxiosInstance } from 'axios';
 import { ConfigService } from '@nestjs/config';
+import { jsonToTxtFile } from '../utils/file.utils';
+import { runTextGenerateWithFile } from 'src/utils/gemini.utils';
 
 @Injectable()
 export class FinancialsService {
@@ -66,6 +68,31 @@ export class FinancialsService {
 				status,
 			);
 		}
+	}
+
+	async analyzeStock(params: {
+		ticker?: string;
+		cik?: string;
+		company_name?: string;
+		filing_date_gte?: string;
+		filing_date_lt?: string;
+		period_of_report_date?: string;
+		timeframe?: 'quarterly' | 'annual' | 'ttm';
+		include_sources?: boolean;
+		limit?: number;
+		sort?: string;
+		order?: 'asc' | 'desc';
+	}): Promise<string> {
+		const financialsData = await this.getFinanncials(params);
+		const fileName = `financials_${
+			params.ticker || 'data'
+		}_${Date.now()}.txt`;
+		const filePath = await jsonToTxtFile(financialsData, fileName);
+
+		return await runTextGenerateWithFile(
+			'이 파일은 회사 재무제표 txt 파일이다. 회사의 전망을 분석해줘',
+			filePath,
+		);
 	}
 
 	async getNews(params: {

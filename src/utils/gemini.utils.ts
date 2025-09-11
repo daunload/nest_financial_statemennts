@@ -15,19 +15,28 @@ export async function runTextGenerate(text: string) {
 	return response.text;
 }
 
-export async function runTextGenerateWithFile(text: string, filePath: string) {
-	const file = await ai.files.upload({
-		file: filePath,
-		config: { mimeType: 'text/plain' },
-	});
+export async function runTextGenerateWithFiles(
+	text: string,
+	files: { path: string; mimeType: string }[],
+) {
+	const uploadFiles = await Promise.all(
+		files.map(async (file) => {
+			return await ai.files.upload({
+				file: file.path,
+				config: { mimeType: file.mimeType },
+			});
+		}),
+	);
+
 	const response = await ai.models.generateContent({
 		model: 'gemini-2.5-flash',
 		contents: createUserContent([
-			createPartFromUri(file.uri, file.mimeType),
+			...uploadFiles.map((file) =>
+				createPartFromUri(file.uri, file.mimeType),
+			),
 			text,
 		]),
 	});
 
-	console.log(response.text);
 	return response.text;
 }

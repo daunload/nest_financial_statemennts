@@ -2,7 +2,7 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import axios, { AxiosInstance } from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { jsonToTxtFile } from '../utils/file.utils';
-import { runTextGenerateWithFile } from 'src/utils/gemini.utils';
+import { runTextGenerateWithFiles } from 'src/utils/gemini.utils';
 
 @Injectable()
 export class FinancialsService {
@@ -70,31 +70,6 @@ export class FinancialsService {
 		}
 	}
 
-	async analyzeStock(params: {
-		ticker?: string;
-		cik?: string;
-		company_name?: string;
-		filing_date_gte?: string;
-		filing_date_lt?: string;
-		period_of_report_date?: string;
-		timeframe?: 'quarterly' | 'annual' | 'ttm';
-		include_sources?: boolean;
-		limit?: number;
-		sort?: string;
-		order?: 'asc' | 'desc';
-	}): Promise<string> {
-		const financialsData = await this.getFinanncials(params);
-		const fileName = `financials_${
-			params.ticker || 'data'
-		}_${Date.now()}.txt`;
-		const filePath = await jsonToTxtFile(financialsData, fileName);
-
-		return await runTextGenerateWithFile(
-			'이 파일은 회사 재무제표 txt 파일이다. 회사의 전망을 분석해줘',
-			filePath,
-		);
-	}
-
 	async getNews(params: {
 		ticker?: string;
 		published_utc?: string;
@@ -127,5 +102,54 @@ export class FinancialsService {
 				status,
 			);
 		}
+	}
+
+	async analyzeStock(params: {
+		ticker?: string;
+		cik?: string;
+		company_name?: string;
+		filing_date_gte?: string;
+		filing_date_lt?: string;
+		period_of_report_date?: string;
+		timeframe?: 'quarterly' | 'annual' | 'ttm';
+		include_sources?: boolean;
+		limit?: number;
+		sort?: string;
+		order?: 'asc' | 'desc';
+	}): Promise<string> {
+		const financialsData = await this.getFinanncials(params);
+		const fileName = `financials_${
+			params.ticker || 'data'
+		}_${Date.now()}.txt`;
+		const filePath = await jsonToTxtFile(financialsData, fileName);
+
+		const newsData = await this.getNews(params);
+		const newsFileName = `news_${params.ticker || 'data'}_${Date.now()}.txt`;
+		const newsFilePath = await jsonToTxtFile(newsData, newsFileName);
+
+		return await runTextGenerateWithFiles(
+			`You are a financial analyst specializing in equity research.  
+            Analyze the following company's financial statement and recent stock performance.  
+            Use only the provided numbers and news summaries.  
+            Do not make up additional data.  
+            If something is unknown, state "N/A".  
+            ⚠️ 반드시 한국어로 답변하세요. (Always respond in Korean)
+
+            📊 제공 데이터에는 회사의 **재무제표**와 **최근 뉴스 요약**이 포함되어 있습니다.  
+            → 따라서 분석 시 반드시 이 데이터만 근거로 판단해야 합니다.  
+
+            TASKS:
+            1. 수익성 (매출, 순이익, 이익률) 분석
+            2. 성장성 (매출/이익 전년 대비 증감률) 평가
+            3. 안정성 (부채비율, 유동비율) 분석
+            4. 밸류에이션 간단 분석 (EPS, PER 계산 가능 시)
+            5. 최근 주가 하락 또는 상승 요인 분석 (재무적 요인, 외부 환경, 뉴스/시장 요인 근거)
+            6. 종합 요약 (투자자 관점에서 3줄 이내)
+            `,
+			[
+				{ path: filePath, mimeType: 'text/plain' },
+				{ path: newsFilePath, mimeType: 'text/plain' },
+			],
+		);
 	}
 }

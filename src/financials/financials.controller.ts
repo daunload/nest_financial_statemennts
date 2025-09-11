@@ -23,10 +23,10 @@ export class FinancialsController {
 			ticker?: string;
 		},
 	) {
-		const filePath = await this.financialsService.analyzeStock(params);
+		const response = await this.financialsService.analyzeStock(params);
 		return {
 			message: 'Financials data saved successfully',
-			filePath,
+			response,
 		};
 	}
 

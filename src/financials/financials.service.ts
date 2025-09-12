@@ -141,6 +141,140 @@ export class FinancialsService {
 		}
 	}
 
+	async getMACD(params: {
+		stockTicker?: string;
+		timestamp?: string;
+		timespan?: string;
+		adjusted?: boolean;
+		short_window?: number;
+		long_window?: number;
+		signal_window?: number;
+		series_type?: number;
+		expand_underlying: boolean;
+		order: string;
+		limit: number;
+	}): Promise<any> {
+		const queryParams: Record<string, any> = {
+			apiKey: this.apiKey,
+		};
+		if (params.timestamp) queryParams.timestamp = params.timestamp;
+		if (params.timespan) queryParams.timespan = params.timespan;
+		if (params.adjusted) queryParams.adjusted = params.adjusted;
+		if (params.short_window) queryParams.short_window = params.short_window;
+		if (params.long_window) queryParams.long_window = params.long_window;
+		if (params.signal_window)
+			queryParams.signal_window = params.signal_window;
+		if (params.series_type) queryParams.series_type = params.series_type;
+		if (params.expand_underlying)
+			queryParams.expand_underlying = params.expand_underlying;
+		if (params.order) queryParams.order = params.order;
+		if (params.limit) queryParams.limit = params.limit;
+
+		try {
+			const response = await this.axiosClient.get(
+				`/v1/indicators/macd/${params.stockTicker}`,
+				{
+					params: queryParams,
+				},
+			);
+			return response.data;
+		} catch (error) {
+			const status =
+				error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR;
+			const message = error.response?.data || error.message;
+			throw new HttpException(
+				`Polygon API error: ${JSON.stringify(message)}`,
+				status,
+			);
+		}
+	}
+
+	async getEMA(params: {
+		stockTicker?: string;
+		timestamp?: string;
+		timespan?: string;
+		adjusted?: boolean;
+		window?: number;
+		series_type?: number;
+		expand_underlying: boolean;
+		order: string;
+		limit: number;
+	}): Promise<any> {
+		const queryParams: Record<string, any> = {
+			apiKey: this.apiKey,
+		};
+		if (params.timestamp) queryParams.timestamp = params.timestamp;
+		if (params.timespan) queryParams.timespan = params.timespan;
+		if (params.adjusted) queryParams.adjusted = params.adjusted;
+		if (params.window) queryParams.window = params.window;
+		if (params.series_type) queryParams.series_type = params.series_type;
+		if (params.expand_underlying)
+			queryParams.expand_underlying = params.expand_underlying;
+		if (params.order) queryParams.order = params.order;
+		if (params.limit) queryParams.limit = params.limit;
+
+		try {
+			const response = await this.axiosClient.get(
+				`/v1/indicators/ema/${params.stockTicker}`,
+				{
+					params: queryParams,
+				},
+			);
+			return response.data;
+		} catch (error) {
+			const status =
+				error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR;
+			const message = error.response?.data || error.message;
+			throw new HttpException(
+				`Polygon API error: ${JSON.stringify(message)}`,
+				status,
+			);
+		}
+	}
+
+	async getRSI(params: {
+		stockTicker?: string;
+		timestamp?: string;
+		timespan?: string;
+		adjusted?: boolean;
+		window?: number;
+		series_type?: number;
+		expand_underlying: boolean;
+		order: string;
+		limit: number;
+	}): Promise<any> {
+		const queryParams: Record<string, any> = {
+			apiKey: this.apiKey,
+		};
+		if (params.timestamp) queryParams.timestamp = params.timestamp;
+		if (params.timespan) queryParams.timespan = params.timespan;
+		if (params.adjusted) queryParams.adjusted = params.adjusted;
+		if (params.window) queryParams.window = params.window;
+		if (params.series_type) queryParams.series_type = params.series_type;
+		if (params.expand_underlying)
+			queryParams.expand_underlying = params.expand_underlying;
+		if (params.order) queryParams.order = params.order;
+		if (params.limit) queryParams.limit = params.limit;
+
+		try {
+			const response = await this.axiosClient.get(
+				`/v1/indicators/rsi/${params.stockTicker}`,
+				{
+					params: queryParams,
+				},
+			);
+			return response.data;
+		} catch (error) {
+			const status =
+				error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR;
+			const message = error.response?.data || error.message;
+			throw new HttpException(
+				`Polygon API error: ${JSON.stringify(message)}`,
+				status,
+			);
+		}
+	}
+
 	async analyzeStock(params: {
 		ticker?: string;
 		cik?: string;

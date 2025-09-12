@@ -3,6 +3,7 @@ import axios, { AxiosInstance } from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { jsonToTxtFile } from '../utils/file.utils';
 import { runTextGenerateWithFiles } from 'src/utils/gemini.utils';
+import type { IndicatorsResponse, NewsResponse } from './financials.types';
 
 @Injectable()
 export class FinancialsService {
@@ -30,7 +31,7 @@ export class FinancialsService {
 		limit?: number;
 		sort?: string;
 		order?: 'asc' | 'desc';
-	}): Promise<any> {
+	}) {
 		const queryParams: Record<string, any> = {
 			apiKey: this.apiKey,
 		};
@@ -76,7 +77,7 @@ export class FinancialsService {
 		order?: string;
 		limit?: number;
 		sort?: string;
-	}): Promise<any> {
+	}) {
 		const queryParams: Record<string, any> = {
 			apiKey: this.apiKey,
 		};
@@ -89,9 +90,12 @@ export class FinancialsService {
 		if (params.sort) queryParams.sort = params.sort ?? 'published_utc';
 
 		try {
-			const response = await this.axiosClient.get('/v2/reference/news', {
-				params: queryParams,
-			});
+			const response = await this.axiosClient.get<NewsResponse>(
+				'/v2/reference/news',
+				{
+					params: queryParams,
+				},
+			);
 			return response.data;
 		} catch (error) {
 			const status =
@@ -111,7 +115,7 @@ export class FinancialsService {
 		window?: string;
 		order?: string;
 		limit?: number;
-	}): Promise<any> {
+	}) {
 		const queryParams: Record<string, any> = {
 			apiKey: this.apiKey,
 		};
@@ -123,7 +127,7 @@ export class FinancialsService {
 		if (params.limit) queryParams.limit = params.limit;
 
 		try {
-			const response = await this.axiosClient.get(
+			const response = await this.axiosClient.get<IndicatorsResponse>(
 				`/v1/indicators/sma/${params.stockTicker}`,
 				{
 					params: queryParams,
@@ -153,7 +157,7 @@ export class FinancialsService {
 		expand_underlying: boolean;
 		order: string;
 		limit: number;
-	}): Promise<any> {
+	}) {
 		const queryParams: Record<string, any> = {
 			apiKey: this.apiKey,
 		};
@@ -171,7 +175,7 @@ export class FinancialsService {
 		if (params.limit) queryParams.limit = params.limit;
 
 		try {
-			const response = await this.axiosClient.get(
+			const response = await this.axiosClient.get<IndicatorsResponse>(
 				`/v1/indicators/macd/${params.stockTicker}`,
 				{
 					params: queryParams,
@@ -199,7 +203,7 @@ export class FinancialsService {
 		expand_underlying: boolean;
 		order: string;
 		limit: number;
-	}): Promise<any> {
+	}) {
 		const queryParams: Record<string, any> = {
 			apiKey: this.apiKey,
 		};
@@ -214,7 +218,7 @@ export class FinancialsService {
 		if (params.limit) queryParams.limit = params.limit;
 
 		try {
-			const response = await this.axiosClient.get(
+			const response = await this.axiosClient.get<IndicatorsResponse>(
 				`/v1/indicators/ema/${params.stockTicker}`,
 				{
 					params: queryParams,
@@ -242,7 +246,7 @@ export class FinancialsService {
 		expand_underlying: boolean;
 		order: string;
 		limit: number;
-	}): Promise<any> {
+	}) {
 		const queryParams: Record<string, any> = {
 			apiKey: this.apiKey,
 		};
@@ -257,7 +261,7 @@ export class FinancialsService {
 		if (params.limit) queryParams.limit = params.limit;
 
 		try {
-			const response = await this.axiosClient.get(
+			const response = await this.axiosClient.get<IndicatorsResponse>(
 				`/v1/indicators/rsi/${params.stockTicker}`,
 				{
 					params: queryParams,
@@ -287,7 +291,7 @@ export class FinancialsService {
 		limit?: number;
 		sort?: string;
 		order?: 'asc' | 'desc';
-	}): Promise<string> {
+	}) {
 		const financialsData = await this.getFinanncials(params);
 		const fileName = `financials_${
 			params.ticker || 'data'

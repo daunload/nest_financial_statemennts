@@ -104,6 +104,43 @@ export class FinancialsService {
 		}
 	}
 
+	async getSMA(params: {
+		stockTicker?: string;
+		timespan?: string;
+		adjusted?: string;
+		window?: string;
+		order?: string;
+		limit?: number;
+	}): Promise<any> {
+		const queryParams: Record<string, any> = {
+			apiKey: this.apiKey,
+		};
+
+		if (params.timespan) queryParams.timespan = params.timespan;
+		if (params.adjusted) queryParams.adjusted = params.adjusted;
+		if (params.window) queryParams.window = params.window;
+		if (params.order) queryParams.order = params.order;
+		if (params.limit) queryParams.limit = params.limit;
+
+		try {
+			const response = await this.axiosClient.get(
+				`/v1/indicators/sma/${params.stockTicker}`,
+				{
+					params: queryParams,
+				},
+			);
+			return response.data;
+		} catch (error) {
+			const status =
+				error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR;
+			const message = error.response?.data || error.message;
+			throw new HttpException(
+				`Polygon API error: ${JSON.stringify(message)}`,
+				status,
+			);
+		}
+	}
+
 	async analyzeStock(params: {
 		ticker?: string;
 		cik?: string;

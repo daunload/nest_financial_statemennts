@@ -7,13 +7,13 @@ export class FinancialsController {
 
 	@Get()
 	async getFinanncials(@Query('ticker') ticker: string) {
-		const financials = await this.financialsService.getFinanncials({
+		const response = await this.financialsService.getFinanncials({
 			ticker: ticker,
 			order: 'desc',
 			limit: 10,
 		});
 
-		return financials.results;
+		return response.results;
 	}
 
 	@Post('analyze')
@@ -32,12 +32,24 @@ export class FinancialsController {
 
 	@Get('/news')
 	async getNews(@Query('ticker') ticker: string) {
-		const financials = await this.financialsService.getNews({
+		const response = await this.financialsService.getNews({
 			ticker: ticker,
 			order: 'desc',
 			limit: 10,
 		});
 
-		return financials.results;
+		return response.results;
+	}
+
+	@Get('/sma')
+	async getSMA(@Query('ticker') ticker: string) {
+		const response = await this.financialsService.getSMA({
+			stockTicker: ticker,
+			timespan: 'day',
+			order: 'desc',
+			limit: 40,
+		});
+
+		return response.results;
 	}
 }

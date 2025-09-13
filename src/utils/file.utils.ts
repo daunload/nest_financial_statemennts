@@ -11,10 +11,9 @@ export async function ensureDirectoryExists(dirPath: string): Promise<void> {
 
 export async function jsonToTxtFile(
 	jsonData: any,
-	fileName?: string,
+	fileName: string,
 ): Promise<string> {
-	const finalFileName = fileName || `${Date.now()}.txt`;
-	const filePath = path.join('./uploads', finalFileName);
+	const filePath = path.join('./uploads', fileName);
 
 	await ensureDirectoryExists('./uploads');
 
